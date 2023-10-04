@@ -26,8 +26,9 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const usersCollection = client.db("Ecommerce_web").collection("users");
-    const cardsCollection = client.db("Ecommerce_web").collection("carts")
-    const phoneProductsCollection = client.db("Ecommerce_web").collection("phone_products")
+    const cardsCollection = client.db("Ecommerce_web").collection("carts");
+    const phoneProductsCollection = client.db("Ecommerce_web").collection("phone_products");
+    const userAddressCollection = client.db("Ecommerce_web").collection("address");
 
     // products get apis
     app.get("/products",async(req,res)=>{
@@ -73,6 +74,19 @@ async function run() {
         res.send(result)
     })
 
+    // user address get apis
+    app.get("/address",async(req,res)=>{
+      const result = await userAddressCollection.find().toArray();
+      res.send(result)
+    })
+
+    // user addres send  database
+    app.post("/address",async(req,res)=>{
+      const address = req.body;
+      const result = await userAddressCollection.insertOne(address);
+      res.send(result);
+    })
+    
     // delete carts menu apis from database
     app.delete("/carts/:id",async(req,res)=>{
       const id = req.params.id;
