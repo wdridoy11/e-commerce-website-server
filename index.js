@@ -85,6 +85,13 @@ async function run() {
       const address = req.body;
       const result = await userAddressCollection.insertOne(address);
       res.send(result);
+    });
+
+    app.delete("/address/:id",async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id : new ObjectId(id)};
+      const result = await userAddressCollection.deleteOne(filter);
+      res.send(result);
     })
     
     // delete carts menu apis from database
