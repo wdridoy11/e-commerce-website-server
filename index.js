@@ -2,7 +2,9 @@ const express = require("express");
 const app = express();
 require('dotenv').config()
 const cors  = require("cors")
+const stripe = require("stripe")(process.env.REACT_PAYMENT_SECRET_KEY);
 const port = process.env.PORT || 5000;
+
 
 // middle ware
 app.use(cors())
@@ -29,6 +31,7 @@ async function run() {
     const cardsCollection = client.db("Ecommerce_web").collection("carts");
     const phoneProductsCollection = client.db("Ecommerce_web").collection("phone_products");
     const userAddressCollection = client.db("Ecommerce_web").collection("address");
+    const paymentCollection = client.db("Ecommerce_web").collection("payment");
 
     // products get apis
     app.get("/products",async(req,res)=>{
@@ -102,6 +105,27 @@ async function run() {
       res.send(result);
     })
 
+    // stripe payment
+    app.post("/create-payment-intent", async(req,res)=>{
+      const {price} = req.body;
+      const amount = parseInt(price*100);
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types:['card']
+      })
+      res.send({
+        clientSecret: paymentIntent.client_secret
+      })
+    })
+
+    app.post('/payment',async(req,res)=>{
+      const payment = req.body;
+      const insertResult = await paymentCollection.insertOne(payment);
+      const query = {_id: {$in: payment.cardItems.map((id)=> new ObjectId(id))}}
+      const deleteResult = await cardsCollection.deleteMany(query);
+      res.send({result: insertResult, deleteResult})
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
