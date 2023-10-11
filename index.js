@@ -29,21 +29,38 @@ async function run() {
     await client.connect();
     const usersCollection = client.db("Ecommerce_web").collection("users");
     const cardsCollection = client.db("Ecommerce_web").collection("carts");
-    const phoneProductsCollection = client.db("Ecommerce_web").collection("phone_products");
-    const userAddressCollection = client.db("Ecommerce_web").collection("address");
     const paymentCollection = client.db("Ecommerce_web").collection("payment");
+    const productsCollection = client.db("Ecommerce_web").collection("products");
+    const userAddressCollection = client.db("Ecommerce_web").collection("address");
+    const blogCollection = client.db("Ecommerce_web").collection("blogs");
+
+
 
     // products get apis
     app.get("/products",async(req,res)=>{
-      const result = await phoneProductsCollection.find().toArray();
+      const result = await productsCollection.find().toArray();
       res.send(result);
+    })
+
+    // blog data get
+    app.get("/blogs",async(req,res)=>{
+      const result = await blogCollection.find().toArray();
+      res.send(result)
+    })
+
+    // single blog
+    app.get("/blog/:id",async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const result = await blogCollection.findOne(filter);
+      res.send(result)
     })
 
     // products single details apis
     app.get("/products/:id",async(req,res)=>{
       const id = req.params.id;
       const filter = {_id : new ObjectId(id)}
-      const result = await phoneProductsCollection.findOne(filter);
+      const result = await productsCollection.findOne(filter);
       res.send(result);
     })
 
@@ -66,7 +83,7 @@ async function run() {
     })
 
     // create user apis and send data mongodb database
-    app.post("/user", async(req,res)=>{
+    app.post("/users", async(req,res)=>{
         const user = req.body;
         const query = {email : user.email};
         const existingUser = await usersCollection.findOne(query);
