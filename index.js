@@ -27,12 +27,13 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    const blogCollection = client.db("Ecommerce_web").collection("blogs");
     const usersCollection = client.db("Ecommerce_web").collection("users");
     const cardsCollection = client.db("Ecommerce_web").collection("carts");
+    const brandCollection = client.db("Ecommerce_web").collection("brand");
     const paymentCollection = client.db("Ecommerce_web").collection("payment");
     const productsCollection = client.db("Ecommerce_web").collection("products");
     const userAddressCollection = client.db("Ecommerce_web").collection("address");
-    const blogCollection = client.db("Ecommerce_web").collection("blogs");
 
 
 
@@ -92,6 +93,12 @@ async function run() {
         }
         const result = await usersCollection.insertOne(user);
         res.send(result)
+    })
+
+    // brand get apis
+    app.get("/brands",async(req,res)=>{
+      const result = await brandCollection.find().toArray();
+      res.send(result)
     })
 
     // user address get apis
