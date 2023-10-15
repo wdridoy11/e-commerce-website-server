@@ -32,32 +32,18 @@ async function run() {
     const cardsCollection = client.db("Ecommerce_web").collection("carts");
     const brandCollection = client.db("Ecommerce_web").collection("brand");
     const paymentCollection = client.db("Ecommerce_web").collection("payment");
+    const wishlistCollection = client.db("Ecommerce_web").collection("wishlist");
     const productsCollection = client.db("Ecommerce_web").collection("products");
     const userAddressCollection = client.db("Ecommerce_web").collection("address");
+    const testimonialCollection = client.db("Ecommerce_web").collection("testimonial");
 
 
-
-    // products get apis
+/*========================= products all apis =========================*/
     app.get("/products",async(req,res)=>{
       const result = await productsCollection.find().toArray();
       res.send(result);
     })
 
-    // blog data get
-    app.get("/blogs",async(req,res)=>{
-      const result = await blogCollection.find().toArray();
-      res.send(result)
-    })
-
-    // single blog
-    app.get("/blog/:id",async(req,res)=>{
-      const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
-      const result = await blogCollection.findOne(filter);
-      res.send(result)
-    })
-
-    // products single details apis
     app.get("/products/:id",async(req,res)=>{
       const id = req.params.id;
       const filter = {_id : new ObjectId(id)}
@@ -65,7 +51,7 @@ async function run() {
       res.send(result);
     })
 
-    // product cards get apis
+/*========================= add to carts all apis =========================*/
     app.get("/carts",async(req,res)=>{
       const email = req.query.email;
       if(!email){
@@ -76,38 +62,48 @@ async function run() {
       res.send(result);
     })
 
-    // product catds apis added post data
     app.post("/carts",async(req,res)=>{
       const item = req.body;
       const result  = await cardsCollection.insertOne(item);
       res.send(result)
     })
 
-    // create user apis and send data mongodb database
-    app.post("/users", async(req,res)=>{
-        const user = req.body;
-        const query = {email : user.email};
-        const existingUser = await usersCollection.findOne(query);
-        if(existingUser){
-          return res.send({message: "User already exists"})
-        }
-        const result = await usersCollection.insertOne(user);
-        res.send(result)
+    app.delete("/carts/:id",async(req,res)=>{
+      const id = req.params.id;
+      const query ={_id : new ObjectId(id)};
+      const result = await cardsCollection.deleteOne(query);
+      res.send(result);
     })
 
-    // brand get apis
-    app.get("/brands",async(req,res)=>{
-      const result = await brandCollection.find().toArray();
+/*========================= wishlist all apis =========================*/
+    app.post("/wishlist",async(req,res)=>{
+      const item = req.body;
+      const result  = await wishlistCollection.insertOne(item);
       res.send(result)
     })
 
-    // user address get apis
+
+
+
+/*========================= Blogs all apis =========================*/
+    app.get("/blogs",async(req,res)=>{
+      const result = await blogCollection.find().toArray();
+      res.send(result)
+    })
+
+    app.get("/blog/:id",async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const result = await blogCollection.findOne(filter);
+      res.send(result)
+    })
+
+/*========================= address all apis =========================*/
     app.get("/address",async(req,res)=>{
       const result = await userAddressCollection.find().toArray();
       res.send(result)
     })
 
-    // user addres send  database
     app.post("/address",async(req,res)=>{
       const address = req.body;
       const result = await userAddressCollection.insertOne(address);
@@ -120,15 +116,8 @@ async function run() {
       const result = await userAddressCollection.deleteOne(filter);
       res.send(result);
     })
-    
-    // delete carts menu apis from database
-    app.delete("/carts/:id",async(req,res)=>{
-      const id = req.params.id;
-      const query ={_id : new ObjectId(id)};
-      const result = await cardsCollection.deleteOne(query);
-      res.send(result);
-    })
 
+/*========================= stripe payment apis =========================*/
     // stripe payment
     app.post("/create-payment-intent", async(req,res)=>{
       const {price} = req.body;
@@ -150,6 +139,33 @@ async function run() {
       const deleteResult = await cardsCollection.deleteMany(query);
       res.send({result: insertResult, deleteResult})
     })
+
+/*========================= users all apis =========================*/
+    // create user apis and send data mongodb database
+    app.post("/users", async(req,res)=>{
+      const user = req.body;
+      const query = {email : user.email};
+      const existingUser = await usersCollection.findOne(query);
+      if(existingUser){
+        return res.send({message: "User already exists"})
+      }
+      const result = await usersCollection.insertOne(user);
+      res.send(result)
+  })
+
+
+    // brand get apis
+    app.get("/brands",async(req,res)=>{
+      const result = await brandCollection.find().toArray();
+      res.send(result)
+    })
+
+    // testimonial
+   app.get("/testimonial",async(req,res)=>{
+    const result = await testimonialCollection.find().toArray();
+    res.send(result)
+   })
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
