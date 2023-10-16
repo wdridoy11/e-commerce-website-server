@@ -76,13 +76,21 @@ async function run() {
     })
 
 /*========================= wishlist all apis =========================*/
+    app.get("/wishlist",async(req,res)=>{
+      const email = req.query.email;
+      if(!email){
+        res.send([])
+      }
+      const query = {email: email}
+      const result = await wishlistCollection.find(query).toArray();
+      res.send(result)
+    })
+
     app.post("/wishlist",async(req,res)=>{
       const item = req.body;
       const result  = await wishlistCollection.insertOne(item);
       res.send(result)
     })
-
-
 
 
 /*========================= Blogs all apis =========================*/
