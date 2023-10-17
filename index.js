@@ -36,6 +36,7 @@ async function run() {
     const productsCollection = client.db("Ecommerce_web").collection("products");
     const userAddressCollection = client.db("Ecommerce_web").collection("address");
     const testimonialCollection = client.db("Ecommerce_web").collection("testimonial");
+    const sellerProductCollection = client.db("Ecommerce_web").collection("seller_product");
 
 
 /*========================= products all apis =========================*/
@@ -48,6 +49,35 @@ async function run() {
       const id = req.params.id;
       const filter = {_id : new ObjectId(id)}
       const result = await productsCollection.findOne(filter);
+      res.send(result);
+    })
+
+    app.post('/products',async(req,res)=>{
+      const item = req.body;
+      const result = await productsCollection.insertOne(item);
+      res.send(result)
+    })
+
+    app.post('/seller_product',async(req,res)=>{
+      const item = req.body;
+      const result = await sellerProductCollection.insertOne({...item,status:"pending"});
+      res.send(result)
+    })
+
+    app.get('/seller_product',async(req,res)=>{
+      const result = await sellerProductCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.patch('/seller_product/:id',async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const updateDoc = {
+        $set:{
+          status:"approved"
+        }
+      }
+      const result = await sellerProductCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
 
