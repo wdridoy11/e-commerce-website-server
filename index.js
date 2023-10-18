@@ -81,6 +81,40 @@ async function run() {
       res.send(result);
     })
 
+    app.get("/my_products",async(req,res)=>{
+      const email = req.query.email;
+      if(!email){
+        res.send([])
+      }
+      const query = {seller_email: email};
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    })
+
+
+    app.put("/products/:id",async(req,res)=>{
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const body = req.body;
+      const updateDoc = {
+        $set:{
+          price: body.price,
+          product_name: body.product_name,
+          small_description:body.small_description,
+          product_description:body.product_description
+        }
+      }
+      const result = await productsCollection.updateOne(filter, updateDoc)
+    })
+
+    app.delete("/products/:id",async(req,res)=>{
+      const id = req.params.id;
+      const query ={_id : new ObjectId(id)};
+      const result = await productsCollection.deleteOne(query);
+      res.send(result);
+    })
+
+
 /*========================= add to carts all apis =========================*/
     app.get("/carts",async(req,res)=>{
       const email = req.query.email;
