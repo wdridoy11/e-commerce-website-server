@@ -44,6 +44,11 @@ async function run() {
       res.send(result)
     })
 
+    app.get("/all_product",async(req,res)=>{
+      const result = await productsCollection.find().toArray();
+      res.send(result);
+    })
+
     app.get("/products/:id",async(req,res)=>{
       const id = req.params.id;
       const filter = {_id : new ObjectId(id)}
