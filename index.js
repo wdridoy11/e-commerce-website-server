@@ -9,7 +9,6 @@ const port = process.env.PORT || 5000;
 app.use(cors())
 app.use(express.json())
 
-
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.REACT_APP_USER_DB}:${process.env.REACT_APP_PASSWORD_DB}@cluster0.v2v9b72.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -35,7 +34,6 @@ async function run() {
     const productsCollection = client.db("Ecommerce_web").collection("products");
     const userAddressCollection = client.db("Ecommerce_web").collection("address");
     const testimonialCollection = client.db("Ecommerce_web").collection("testimonial");
-    const sellerProductCollection = client.db("Ecommerce_web").collection("seller_product");
 
 
 /*========================= products all apis =========================*/
@@ -225,7 +223,7 @@ async function run() {
     })
 
 /*========================= users all apis =========================*/
-    app.post("/users", async(req,res)=>{
+  app.post("/users", async(req,res)=>{
       const user = req.body;
       const query = {email : user.email};
       const existingUser = await usersCollection.findOne(query);
@@ -281,6 +279,17 @@ async function run() {
     res.send(result)
   })
 
+  app.patch("/users/user/:id",async(req,res)=>{
+    const id = req.params.id;
+    const filter = {_id: new ObjectId(id)};
+    const updateDoc={
+      $set:{
+        role:"user"
+      }
+    }
+    const result = await usersCollection.updateOne(filter,updateDoc);
+    res.send(result)
+  })
 
     // brand get apis
     app.get("/brands",async(req,res)=>{
