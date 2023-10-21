@@ -60,6 +60,14 @@ async function run() {
       res.send(result)
     })
 
+    app.get("/search_product/:searchValue",async(req,res)=>{
+      const value = req.params.searchValue;
+      const result = await productsCollection.find({
+        $or:[{product_name: { $regex: value, $options:"i" }}]
+      }).toArray();
+      res.send(result)
+    })
+
 /*========================= seller product all apis =========================*/
     app.post('/seller_product',async(req,res)=>{
       const item = req.body;
