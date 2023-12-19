@@ -34,6 +34,7 @@ async function run() {
     const productsCollection = client.db("Ecommerce_web").collection("products");
     const userAddressCollection = client.db("Ecommerce_web").collection("address");
     const testimonialCollection = client.db("Ecommerce_web").collection("testimonial");
+    const OrderCollection = client.db("Ecommerce_web").collection("order");
 
 
 /*========================= products all apis =========================*/
@@ -62,10 +63,18 @@ async function run() {
 
     app.get("/search_product/:searchValue",async(req,res)=>{
       const value = req.params.searchValue;
+      const valueCase = value.toLowerCase();
       const result = await productsCollection.find({
-        $or:[{product_name: { $regex: value, $options:"i" }}]
+        $or:[{product_name: { $regex: valueCase, $options:"i" }}]
       }).toArray();
       res.send(result)
+    })
+
+    app.get("/products/category/:category",async (req,res)=>{
+      const category = req.params.category;
+      // const categoryConvert = category.toLowerCase();
+      const result = await productsCollection.find({ category: category, status: 'approved' }).toArray();
+      res.send(result);
     })
 
 /*========================= seller product all apis =========================*/
@@ -119,10 +128,10 @@ async function run() {
       res.send(result);
     })
 
-    app.delete("/products/:id",async(req,res)=>{
+    app.delete("/product/:id",async(req,res)=>{
       const id = req.params.id;
-      const query ={_id : new ObjectId(id)};
-      const result = await productsCollection.deleteOne(query);
+      const filter = {_id: new ObjectId(id)}
+      const result = await productsCollection.deleteOne(filter);
       res.send(result);
     })
 
@@ -225,10 +234,18 @@ async function run() {
     app.post('/payment',async(req,res)=>{
       const payment = req.body;
       const insertResult = await paymentCollection.insertOne(payment);
-      const query = {_id: {$in: payment.cardItems.map((id)=> new ObjectId(id))}}
-      const deleteResult = await cardsCollection.deleteMany(query);
-      res.send({result: insertResult, deleteResult})
+      // const query = {_id: {$in: payment.cardItems.map((id)=> new ObjectId(id))}}
+      // const deleteResult = await cardsCollection.deleteMany(query);
+      // res.send({result: insertResult, deleteResult})
+      res.send(insertResult)
     })
+  /*========================= order apis =========================*/
+    app.post("/order",async(req,res)=>{
+      const address = req.body;
+      const result = await OrderCollection.insertOne(address);
+      console.log(result);
+      res.send(result);
+    });
 
 /*========================= users all apis =========================*/
   app.post("/users", async(req,res)=>{
@@ -311,6 +328,7 @@ async function run() {
     res.send(result)
    })
 
+  
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
