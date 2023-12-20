@@ -243,9 +243,13 @@ async function run() {
     app.post("/order",async(req,res)=>{
       const address = req.body;
       const result = await OrderCollection.insertOne(address);
-      console.log(result);
       res.send(result);
     });
+    
+    app.get("/order",async(req,res)=>{
+      const result = await OrderCollection.find().toArray();
+      res.send(result);
+    })
 
 /*========================= users all apis =========================*/
   app.post("/users", async(req,res)=>{
