@@ -247,10 +247,14 @@ async function run() {
     });
     
     app.get("/order",async(req,res)=>{
-      const result = await OrderCollection.find().toArray();
+      const email = req.query.email;
+      if(!email){
+        res.send([])
+      }
+      const query = {email: email};
+      const result = await OrderCollection.find(query).toArray();
       res.send(result);
     })
-
 /*========================= users all apis =========================*/
   app.post("/users", async(req,res)=>{
       const user = req.body;
