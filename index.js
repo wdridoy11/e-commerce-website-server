@@ -234,11 +234,11 @@ async function run() {
     app.post('/payment',async(req,res)=>{
       const payment = req.body;
       const insertResult = await paymentCollection.insertOne(payment);
-      // const query = {_id: {$in: payment.cardItems.map((id)=> new ObjectId(id))}}
-      // const deleteResult = await cardsCollection.deleteMany(query);
-      // res.send({result: insertResult, deleteResult})
-      res.send(insertResult)
+      const query = {_id: {$in: payment.cardItems.map((id)=> new ObjectId(id))}}
+      const deleteResult = await cardsCollection.deleteMany(query);
+      res.send({result: insertResult, deleteResult})
     })
+
   /*========================= order apis =========================*/
     app.post("/order",async(req,res)=>{
       const address = req.body;
