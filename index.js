@@ -308,6 +308,13 @@ async function run() {
     const result = {seller: user?.role === "seller"}
     res.send(result);
   })
+  app.get("/users/user/:email",async(req,res)=>{
+    const email = req.params.email;
+    const filter = {email : email};
+    const user = await usersCollection.findOne(filter);
+    const result = {seller: user?.role === "user"}
+    res.send(result);
+  })
 
   app.patch("/users/admin/:id",async(req,res)=>{
     const id = req.params.id;
